@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FB Auto Poster v3</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .section {
+            margin-bottom: 25px;
+        }
+        
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+            transition: border 0.2s;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .file-upload {
+            border: 2px dashed #cbd5e0;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .file-upload:hover {
+            border-color: #667eea;
+            background: #f7fafc;
+        }
+        
+        .file-upload input {
+            display: none;
+        }
+        
+        .file-upload-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .preview-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            aspect-ratio: 1;
+        }
+        
+        .preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .preview-remove {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            line-height: 1;
+        }
+        
+        .groups-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .group-tag {
+            background: #edf2f7;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .group-tag button {
+            background: none;
+            border: none;
+            color: #e53e3e;
+            cursor: pointer;
+            font-size: 16px;
+            line-height: 1;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+        
+        input[type="text"] {
+            flex: 1;
+            padding: 10px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #edf2f7;
+            color: #4a5568;
+        }
+        
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+        
+        .btn-success {
+            background: #48bb78;
+            color: white;
+            width: 100%;
+            padding: 14px;
+            font-size: 16px;
+        }
+        
+        .btn-success:hover:not(:disabled) {
+            background: #38a169;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .log-box {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        
+        .log-entry {
+            margin-bottom: 5px;
+        }
+        
+        .log-success { color: #68d391; }
+        .log-error { color: #fc8181; }
+        .log-info { color: #63b3ed; }
+        .log-warning { color: #f6ad55; }
+        
+        .cookie-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-valid {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        
+        .status-invalid {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .progress-section {
+            margin-top: 15px;
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 8px;
+            font-size: 13px;
+            color: #4a5568;
+        }
+
+        .summary-box {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .summary-stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+
+        .stat {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        .stat-success {
+            background: #c6f6d5;
+        }
+
+        .stat-error {
+            background: #fed7d7;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #4a5568;
+        }
+
+        .details-list {
+            margin-top: 10px;
+        }
+
+        .detail-item {
+            padding: 8px 12px;
+            background: white;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .detail-icon {
+            font-size: 18px;
+        }
+
+        .detail-text {
+            flex: 1;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Facebook Auto Poster v3</h1>
+            <p>Đăng bài tự động lên nhiều nhóm Facebook</p>
+        </div>
+        
+        <div class="content">
+            <!-- Content -->
+            <div class="section">
+                <div class="section-title">📝 Nội dung bài viết</div>
+                <textarea id="content" rows="4" placeholder="Nhập nội dung bài viết..."></textarea>
+            </div>
+            
+            <!-- Media Upload -->
+            <div class="section">
+                <div class="section-title">🖼️ Hình ảnh/Video</div>
+                <div class="file-upload" onclick="document.getElementById('mediaInput').click()">
+                    <div class="file-upload-icon">📁</div>
+                    <div>Click để chọn file</div>
+                    <input type="file" id="mediaInput" multiple accept="image/*,video/*">
+                </div>
+                <div id="preview" class="preview-grid"></div>
+            </div>
+            
+            <!-- Groups -->
+            <div class="section">
+                <div class="section-title">👥 Nhóm đích (<span id="groupCount">0</span>)</div>
+                <div class="input-group">
+                    <input type="text" id="groupInput" placeholder="https://facebook.com/groups/...">
+                    <button class="btn btn-primary" onclick="addGroup()">Thêm</button>
+                </div>
+                <div id="groupsList" class="groups-list"></div>
+            </div>
+            
+            <!-- Cookies -->
+            <div class="section">
+                <div class="section-title">
+                    🍪 Cookies 
+                    <span id="cookieStatus"></span>
+                </div>
+                <textarea id="cookies" rows="3" placeholder='[{"name":"c_user","value":"..."}]'></textarea>
+                <div class="cookie-actions">
+                    <button class="btn btn-secondary" onclick="testCookies()">Test Cookies</button>
+                    <button class="btn btn-secondary" onclick="saveCookies()">Lưu Cookies</button>
+                </div>
+            </div>
+            
+            <!-- Settings -->
+            <div class="section">
+                <div class="section-title">⚙️ Webhook URL</div>
+                <input type="text" id="webhookUrl" placeholder="http://localhost:5678/webhook/facebook-post" value="http://localhost:5678/webhook/facebook-post">
+            </div>
+            
+            <!-- Submit -->
+            <button class="btn btn-success" id="submitBtn" onclick="postToFacebook()">
+                🚀 Đăng bài
+            </button>
+
+            <!-- Progress -->
+            <div id="progressSection" class="progress-section">
+                <div class="progress-bar">
+                    <div id="progressFill" class="progress-fill"></div>
+                </div>
+                <div id="progressText" class="progress-text">Đang xử lý...</div>
+            </div>
+
+            <!-- Summary -->
+            <div id="summaryBox" class="summary-box">
+                <div class="summary-stats">
+                    <div class="stat stat-success">
+                        <div id="successCount" class="stat-number">0</div>
+                        <div class="stat-label">Thành công</div>
+                    </div>
+                    <div class="stat stat-error">
+                        <div id="errorCount" class="stat-number">0</div>
+                        <div class="stat-label">Thất bại</div>
+                    </div>
+                </div>
+                <div id="detailsList" class="details-list"></div>
+            </div>
+            
+            <!-- Logs -->
+            <div class="section" style="margin-top: 25px;">
+                <div class="section-title">📊 Logs</div>
+                <div id="logs" class="log-box"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedFiles = [];
+        let groups = JSON.parse(localStorage.getItem('fb_groups') || '[]');
+        
+        // Initialize
+        loadCookies();
+        renderGroups();
+        
+        // File handling
+        document.getElementById('mediaInput').addEventListener('change', function(e) {
+            selectedFiles = Array.from(e.target.files);
+            renderPreview();
+        });
+        
+        function renderPreview() {
+            const preview = document.getElementById('preview');
+            preview.innerHTML = selectedFiles.map((file, i) => `
+                <div class="preview-item">
+                    <img src="${URL.createObjectURL(file)}">
+                    <button class="preview-remove" onclick="removeFile(${i})">×</button>
+                </div>
+            `).join('');
+        }
+        
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            renderPreview();
+        }
+        
+        // Groups
+        function addGroup() {
+            const input = document.getElementById('groupInput');
+            const url = input.value.trim();
+            if (url && !groups.includes(url)) {
+                groups.push(url);
+                localStorage.setItem('fb_groups', JSON.stringify(groups));
+                renderGroups();
+                input.value = '';
+            }
+        }
+        
+        function removeGroup(index) {
+            groups.splice(index, 1);
+            localStorage.setItem('fb_groups', JSON.stringify(groups));
+            renderGroups();
+        }
+        
+        function renderGroups() {
+            const list = document.getElementById('groupsList');
+            const count = document.getElementById('groupCount');
+            count.textContent = groups.length;
+            
+            list.innerHTML = groups.map((g, i) => `
+                <div class="group-tag">
+                    <span>${g.split('/').pop()}</span>
+                    <button onclick="removeGroup(${i})">×</button>
+                </div>
+            `).join('');
+        }
+        
+        // Cookies
+        function loadCookies() {
+            const saved = localStorage.getItem('fb_cookies');
+            if (saved) {
+                document.getElementById('cookies').value = saved;
+                validateCookies(saved);
+            }
+        }
+        
+        function saveCookies() {
+            const cookies = document.getElementById('cookies').value;
+            localStorage.setItem('fb_cookies', cookies);
+            validateCookies(cookies);
+            log('✅ Đã lưu cookies', 'success');
+        }
+        
+        function validateCookies(cookieStr) {
+            try {
+                const cookies = JSON.parse(cookieStr);
+                const hasRequired = cookies.some(c => c.name === 'c_user') && 
+                                  cookies.some(c => c.name === 'xs');
+                const status = document.getElementById('cookieStatus');
+                status.innerHTML = hasRequired 
+                    ? '<span class="status-badge status-valid">✓ Hợp lệ</span>'
+                    : '<span class="status-badge status-invalid">✗ Thiếu c_user/xs</span>';
+            } catch {
+                const status = document.getElementById('cookieStatus');
+                status.innerHTML = '<span class="status-badge status-invalid">✗ JSON không hợp lệ</span>';
+            }
+        }
+        
+        function testCookies() {
+            const cookies = document.getElementById('cookies').value;
+            validateCookies(cookies);
+        }
+        
+        // Post
+        async function postToFacebook() {
+            const btn = document.getElementById('submitBtn');
+            const progressSection = document.getElementById('progressSection');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            const summaryBox = document.getElementById('summaryBox');
+            
+            btn.disabled = true;
+            btn.textContent = '⏳ Đang xử lý...';
+            progressSection.style.display = 'block';
+            summaryBox.style.display = 'none';
+            progressFill.style.width = '0%';
+            
+            try {
+                const content = document.getElementById('content').value;
+                const cookies = JSON.parse(document.getElementById('cookies').value);
+                const webhookUrl = document.getElementById('webhookUrl').value;
+                
+                if (!content && selectedFiles.length === 0) {
+                    throw new Error('Cần có nội dung hoặc hình ảnh');
+                }
+                
+                if (groups.length === 0) {
+                    throw new Error('Chưa thêm nhóm đích');
+                }
+                
+                log(`🔄 Bắt đầu đăng lên ${groups.length} nhóm...`, 'info');
+                progressFill.style.width = '10%';
+                
+                // Convert files to base64
+                const media_files = await Promise.all(
+                    selectedFiles.map(file => fileToBase64(file))
+                );
+                progressFill.style.width = '30%';
+                progressText.textContent = 'Đang gửi request...';
+                
+                const payload = {
+                    content,
+                    media_files,
+                    group_urls: groups,
+                    cookies
+                };
+                
+                log('📤 Đang gửi request...', 'info');
+                
+                const res = await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+                
+                progressFill.style.width = '90%';
+                progressText.textContent = 'Đang xử lý...';
+                
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+                }
+                
+                const result = await res.json();
+                progressFill.style.width = '100%';
+                progressText.textContent = 'Hoàn thành!';
+                
+                // Parse summary from result
+                const summary = result.summary || result;
+                
+                if (!summary || typeof summary.total_groups === 'undefined') {
+                    log('❌ Response format không đúng', 'error');
+                    console.error('Response:', result);
+                    return;
+                }
+                
+                // Display summary
+                displaySummary(summary);
+                
+                // Log results
+                log(`\n📊 KẾT QUẢ TỔNG HỢP`, 'info');
+                log(`   Tổng: ${summary.total_groups} nhóm`, 'info');
+                log(`   ✅ Thành công: ${summary.success_count}`, 'success');
+                log(`   ❌ Thất bại: ${summary.error_count}`, 'error');
+                log(`   ⏰ ${new Date(summary.completed_at).toLocaleString('vi-VN')}`, 'info');
+                
+                // Log details
+                if (summary.details && summary.details.length > 0) {
+                    log(`\n📝 CHI TIẾT:`, 'info');
+                    summary.details.forEach((d, i) => {
+                        const name = d.group_url.split('/').pop() || `Nhóm ${i+1}`;
+                        log(`   ${i+1}. ${d.icon} ${name}`, d.status === 'success' ? 'success' : 'error');
+                    });
+                }
+                
+                if (summary.success_count === summary.total_groups) {
+                    log(`\n🎉 Hoàn thành! Tất cả nhóm thành công!`, 'success');
+                } else if (summary.success_count > 0) {
+                    log(`\n⚠️ Một phần thành công (${summary.success_count}/${summary.total_groups})`, 'warning');
+                } else {
+                    log(`\n💥 Tất cả thất bại`, 'error');
+                }
+                
+            } catch (err) {
+                log('❌ Lỗi: ' + err.message, 'error');
+                console.error(err);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🚀 Đăng bài';
+                setTimeout(() => {
+                    progressSection.style.display = 'none';
+                }, 3000);
+            }
+        }
+        
+        function displaySummary(summary) {
+            const summaryBox = document.getElementById('summaryBox');
+            const successCount = document.getElementById('successCount');
+            const errorCount = document.getElementById('errorCount');
+            const detailsList = document.getElementById('detailsList');
+            
+            summaryBox.style.display = 'block';
+            successCount.textContent = summary.success_count || 0;
+            errorCount.textContent = summary.error_count || 0;
+            
+            if (summary.details && summary.details.length > 0) {
+                detailsList.innerHTML = summary.details.map(d => `
+                    <div class="detail-item">
+                        <div class="detail-icon">${d.icon}</div>
+                        <div class="detail-text">
+                            <strong>${d.group_url.split('/').pop()}</strong>
+                            ${d.error ? `<br><span style="color: #e53e3e; font-size: 12px;">${d.error}</span>` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+        
+        function fileToBase64(file) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    resolve({
+                        filename: file.name,
+                        type: file.type,
+                        data: reader.result.split(',')[1]
+                    });
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+        
+        function log(message, type = 'info') {
+            const logs = document.getElementById('logs');
+            const time = new Date().toLocaleTimeString('vi-VN');
+            const entry = `<div class="log-entry log-${type}">[${time}] ${message}</div>`;
+            logs.innerHTML = entry + logs.innerHTML;
+        }
+    </script>
+</body>
+</html>
